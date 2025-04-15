@@ -19,20 +19,22 @@ void* serializar_paquete(t_paquete* paquete, int bytes)
 int crear_conexion(char *ip, char* puerto)
 {
 	struct addrinfo hints;
-	struct addrinfo *server_info;
+	struct addrinfo *server_info;//server_info es un puntero que, una vez inicializado, va a apuntar a una lista de estructuras addrinfo generadas por la función getaddrinfo().
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	getaddrinfo(ip, puerto, &hints, &server_info);
+	getaddrinfo(ip, puerto, &hints, &server_info);//Después de getaddrinfo(), server_info apunta a una lista enlazada de estructuras addrinfo, cada una con información sobre: Tipo de dirección (AF_INET, etc.),Tipo de socket (SOCK_STREAM, etc.), Protocolo (IPPROTO_TCP, etc.), Dirección IP lista para usar en bind, Puntero al siguiente nodo de la lista.
+	// nos guarda en la variable server_info un puntero que apunta hacia los datos necesarios para la creación del socket.
+
 
 	// Ahora vamos a crear el socket.
-	int socket_cliente = 0;
+	int socket_cliente = socket(server_info->ai_family, server_info->ai_socktype, server_info->ai_protocol);
 
 	// Ahora que tenemos el socket, vamos a conectarlo
-
+	connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen);
 
 	freeaddrinfo(server_info);
 
